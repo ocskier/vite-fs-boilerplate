@@ -1,8 +1,12 @@
 /* eslint-disable no-console */
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from 'react-oidc-context';
+import { useQuery } from '@tanstack/react-query';
 
 import Callback from '@auth/Callback';
+
+import gqlRequest from '@api/request';
+import { GET_API_VERSION } from '@api/gql';
 
 import reactLogo from '@assets/react.svg';
 import viteLogo from '/vite.svg';
@@ -21,6 +25,15 @@ function App() {
   } = auth;
 
   const [count, setCount] = useState(0);
+
+  const { isFetching, error, data } = useQuery({
+    queryKey: ['api-version'],
+    queryFn: async () =>
+      gqlRequest(
+        GET_API_VERSION,
+        {},
+      ),
+  })
 
   const getAuthToken = useCallback(
     async () => {
@@ -53,6 +66,13 @@ function App() {
 
   return (
     <main>
+      <div>
+        {
+          error ? error.message :
+          data ? `Current API version: ${(data as any)?.version.split(/\s+(?=\S*)/)[3].split('!')[0]}` :
+          isFetching ? `Loading ...` : ''
+        }
+      </div> 
       <div>
         <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
           <img src={viteLogo} className="logo" alt="Vite logo" />
