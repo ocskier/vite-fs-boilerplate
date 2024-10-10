@@ -1,0 +1,54 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "baseUrl": ".",
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "noImplicitAny": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "paths": {
+      "@app": ["./src/App.tsx"],
+      "@api": ["./src/services/API"],
+      "@api/*": ["./src/services/API/*"],
+      "@assets": ["./src/assets/*"],
+      "@auth/*": ["./src/services/Auth/*"],
+      "@components/*": ["./src/components/*"],
+      "@contexts": ["./src/store/contexts"],
+      "@contexts/*": ["./src/store/contexts/*"],
+      "@data": ["./src/data/mock-data"],
+      "@reducers": ["./src/store/reducers"],
+      "@reducers/*": ["./src/store/reducers/*"],
+      "@shared/*": ["./src/components/shared/*"],
+      "@src": ["./src"],
+      "@src/*": ["./src/*"],
+      "@store": ["./src/store"],
+      "@store/*": ["./src/store/*"],
+      "@testing": ["src/test-setup"],
+      "@typedefs": ["./src/typedefs"]
+    },
+    "types": ["./src/typedefs"]
+  },
+  "include": ["src", "./src/cypress.d.ts", "./cypress/support/component.d.ts"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

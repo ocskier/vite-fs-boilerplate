@@ -1,0 +1,152 @@
+name: Build and deploy app artifacts thru Github pipelines
+run-name: Build & Deploy ${{github.run_number}}.${{github.run_attempt}} - Create and deploy SPA artifacts thru Github pipelines
+
+on:
+  push:
+    branches:
+      - main
+      - 'release/**'
+  workflow_dispatch:
+
+env:
+  HTTPS: ${{secrets.HTTPS}}
+  VITE_SSO_OAUTH_CLIENT_ID: ${{secrets.VITE_SSO_OAUTH_CLIENT_ID}}
+  VITE_SSO_OAUTH_SCOPE: ${{secrets.VITE_SSO_OAUTH_SCOPE}}
+  SASS_PATH: ${{secrets.SASS_PATH}}
+
+jobs:
+  test-trigger:
+    name: Trigger Testing
+
+  qa:
+    name: Build QA
+    environment: qa
+    runs-on: [self-hosted, X64, linux]
+    container:
+      image: node:20.15-alpine
+    env:
+      VITE_BASE_URL: ${{secrets.VITE_BASE_URL}}
+      VITE_ENV: ${{secrets.VITE_ENV}}
+      VITE_SSO_URL: ${{secrets.VITE_SSO_URL}}
+      VITE_SSO_REDIRECT_URL: ${{secrets.VITE_SSO_REDIRECT_URL}}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Inject env vars
+        if: env.VITE_ENV
+        run: echo Injected environment variables
+
+      - name: Build client
+        run: |
+          cd client 
+      
+      - name: npm install
+        run: |
+          npm ci
+
+      - name: npm build
+        run: |
+          npm run build
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: qa-build
+          path: ./dist
+
+  staging:
+    name: Build Staging
+    environment: staging
+    runs-on: [self-hosted, X64, linux]
+    container:
+      image: node:20.15-alpine
+    env:
+      VITE_BASE_URL: ${{secrets.VITE_BASE_URL}}
+      VITE_ENV: ${{secrets.VITE_ENV}}
+      VITE_SSO_URL: ${{secrets.VITE_SSO_URL}}
+      VITE_SSO_REDIRECT_URL: ${{secrets.VITE_SSO_REDIRECT_URL}}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Inject env vars
+        if: env.VITE_ENV
+        run: echo Injected environment variables
+
+      - name: Build client
+        run: |
+          cd client 
+
+      - name: npm install
+        run: |
+          npm ci
+
+      - name: npm build
+        run: |
+          npm run build
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: staging-build
+          path: ./dist
+
+  prod:
+    name: Build PROD
+    environment: prod
+    runs-on: [self-hosted, X64, linux]
+    container:
+      image: node:20.15-alpine
+    env:
+      VITE_BASE_URL: ${{secrets.VITE_BASE_URL}}
+      VITE_ENV: ${{secrets.VITE_ENV}}
+      VITE_SSO_URL: ${{secrets.VITE_SSO_URL}}
+      VITE_SSO_REDIRECT_URL: ${{secrets.VITE_SSO_REDIRECT_URL}}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Inject env vars
+        if: env.VITE_ENV
+        run: echo Injected environment variables
+
+      - name: Build client
+        run: |
+          cd client 
+
+      - name: npm install
+        run: |
+          npm ci
+
+      - name: npm build
+        run: |
+          npm run build
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: prod-build
+          path: ./dist
+
+  deploy-dev:
+    name: Deploy Dev
+    needs: [dev, qa, prod]
+
+  deploy-qa:
+    name: Deploy QA
+    needs: [deploy-dev]
+
+  deploy-pre-prod:
+    name: Production Admin approval
+    environment: PROD-Pre-Release
+    needs: [deploy-qa]
+    runs-on: [self-hosted, X64, linux]
+
+    steps:
+      - name: Display approval
+        run: echo Admin approval granted
+
+  deploy-prod:
+    name: Deploy PROD
+    needs: [deploy-pre-prod]
