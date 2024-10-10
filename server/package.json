@@ -1,0 +1,54 @@
+{
+  "name": "night-owl-dev-co-api-graph",
+  "version": "1.0.0",
+  "description": "Backend template for scaffolding Graph API application",
+  "main": "server.js",
+  "type": "module",
+  "author": "Jon Jackson <ocskier@gmail.com>",
+  "scripts": {
+    "start:dev": "npm run watch",
+    "start:prod": "node server.js",
+    "watch": "nodemon server",
+    "start": "if-env NODE_ENV=production && npm run start:prod || npm run start:dev",
+    "prettier:check": "prettier --check .",
+    "prettier:fix": "prettier --write --ignore-unknown .",
+    "prepare:husky": "chmod +x ./prepare-husky.sh && ./prepare-husky.sh",
+    "test": "echo Running all tests && jest --passWithNoTests --verbose ./tests/*",
+    "test:watch": "jest --verbose --watchAll ./tests/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Night-Owl-Dev-Co/night-owl-dev-co-api.git"
+  },
+  "homepage": "https://github.com/Night-Owl-Dev-Co/night-owl-dev-co-api#readme",
+  "dependencies": {
+    "@apollo/server": "^4.7.1",
+    "chalk": "^5.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "if-env": "^1.0.4",
+    "jsonwebtoken": "9.0.2",
+    "mongoose": "^7.2.0",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "husky": "^8.0.3",
+    "jest": "^29.5.0",
+    "lint-staged": "^13.2.2",
+    "nodemon": "^2.0.22",
+    "prettier": "2.8.8",
+    "typescript": "^5.0.4"
+  },
+  "lint-staged": {
+    "**/*": "npm run prettier:fix"
+  },
+  "keywords": [
+    "Javascript",
+    "Express"
+  ],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Night-Owl-Dev-Co/night-owl-dev-co-api/issues"
+  }
+}
