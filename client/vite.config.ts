@@ -59,6 +59,9 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: 3000,
+      proxy: {
+        "/graphql": 'http://localhost:5001',
+      }
     },
     test: {
       coverage: {

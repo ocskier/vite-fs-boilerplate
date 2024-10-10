@@ -28,6 +28,11 @@ await server.start();
 // Cors in non-prod environments
 if (!(process.env.NODE_ENV === "production")) app.use(cors());
 
+morgan.token('graphql-query', (req) => {
+  const {query, variables, operationName} = req.body;
+  return `Operation: ${operationName}`;
+});
+
 // Logging
 app.use(
   morgan((tokens, req, res) => {
@@ -41,6 +46,8 @@ app.use(
           ? chalk.rgb(253, 216, 4).bold.bgGray(tokens.status(req, res))
           : chalk.bold.rgb(31, 230, 38).bgGray(tokens.status(req, res)),
         chalk.white(tokens.url(req, res)),
+        chalk.white(tokens['response-time'](req, res), 'ms'),
+        chalk.blue(tokens["graphql-query"](req)),
       ].join(" ")
     );
   })
