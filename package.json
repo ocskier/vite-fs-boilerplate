@@ -1,0 +1,27 @@
+{
+  "name": "vite-fs-express",
+  "version": "1.0.0",
+  "description": "This is a simple example of how to use Vite with Express",
+  "main": "server/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"cd client && npm run dev\" \"cd server && npm run start:dev\"",
+    "install": "cd client && npm install && cd ../server && npm install",
+    "build": "cd client && npm run build",
+    "start": "cd server && npm run start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ocskier/vite-fs-express.git"
+  },
+  "keywords": [],
+  "author": "Jon Jackson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ocskier/vite-fs-express/issues"
+  },
+  "homepage": "https://github.com/ocskier/vite-fs-express#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
