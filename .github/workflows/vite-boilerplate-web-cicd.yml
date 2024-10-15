@@ -17,7 +17,7 @@ env:
 jobs:
   test-trigger:
     name: Trigger Testing
-    runs-on: [self-hosted, X64, windows]
+    runs-on: [X64, windows] # need to add self-hosted runner after docker install
     steps:
       - uses: actions/checkout@v3
 
@@ -28,7 +28,7 @@ jobs:
   qa:
     name: Build QA
     environment: qa
-    runs-on: [self-hosted, X64, windows]
+    runs-on: [X64, windows] # need to add self-hosted runner after docker install
     container:
       image: node:20.15-alpine
     env:
@@ -65,7 +65,7 @@ jobs:
   staging:
     name: Build Staging
     environment: staging
-    runs-on: [self-hosted, X64, windows]
+    runs-on: [X64, windows] # need to add self-hosted runner after docker install
     container:
       image: node:20.15-alpine
     env:
@@ -102,7 +102,7 @@ jobs:
   prod:
     name: Build PROD
     environment: prod
-    runs-on: [self-hosted, X64, windows]
+    runs-on: [X64, windows] # need to add self-hosted runner after docker install
     container:
       image: node:20.15-alpine
     env:
