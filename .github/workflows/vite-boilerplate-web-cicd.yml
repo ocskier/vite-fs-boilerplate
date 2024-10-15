@@ -63,7 +63,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: qa-build
-          path: ./dist
+          path: ./client/dist
 
   staging:
     name: Build Staging
@@ -103,7 +103,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: staging-build
-          path: ./dist
+          path: ./client/dist
 
   prod:
     name: Build PROD
@@ -143,18 +143,19 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: prod-build
-          path: ./dist
+          path: ./client/dist
 
   deploy-qa:
     name: Deploy QA
     needs: [qa, staging, prod]
     environment: qa-release
-    runs-on: [X64, linux]
+    runs-on: [X64, windows]
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: qa-build
           path: ./artifacts
+
       - name: Display structure of downloaded files
         run: ls -R ./artifacts
 
@@ -162,12 +163,13 @@ jobs:
     name: Deploy Staging
     needs: [deploy-qa]
     environment: staging-release
-    runs-on: [X64, linux]
+    runs-on: [X64, windows]
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: staging-build
           path: ./artifacts
+
       - name: Display structure of downloaded files
         run: ls -R ./artifacts
 
@@ -175,11 +177,12 @@ jobs:
     name: Deploy PROD
     needs: [deploy-staging]
     environment: prod-release
-    runs-on: [X64, linux]
+    runs-on: [X64, windows]
     steps:
       - uses: actions/download-artifact@v4
         with:
           name: prod-build
           path: ./artifacts
+
       - name: Display structure of downloaded files
         run: ls -R ./artifacts
