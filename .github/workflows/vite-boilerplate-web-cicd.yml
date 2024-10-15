@@ -17,11 +17,18 @@ env:
 jobs:
   test-trigger:
     name: Trigger Testing
+    runs-on: [self-hosted, X64, windows]
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Test
+        if: env.HTTPS
+        run: echo Injected environment variables
 
   qa:
     name: Build QA
     environment: qa
-    runs-on: [self-hosted, X64, linux]
+    runs-on: [self-hosted, X64, windows]
     container:
       image: node:20.15-alpine
     env:
@@ -58,7 +65,7 @@ jobs:
   staging:
     name: Build Staging
     environment: staging
-    runs-on: [self-hosted, X64, linux]
+    runs-on: [self-hosted, X64, windows]
     container:
       image: node:20.15-alpine
     env:
@@ -95,7 +102,7 @@ jobs:
   prod:
     name: Build PROD
     environment: prod
-    runs-on: [self-hosted, X64, linux]
+    runs-on: [self-hosted, X64, windows]
     container:
       image: node:20.15-alpine
     env:
@@ -129,24 +136,41 @@ jobs:
           name: prod-build
           path: ./dist
 
-  deploy-dev:
-    name: Deploy Dev
-    needs: [dev, qa, prod]
-
   deploy-qa:
     name: Deploy QA
-    needs: [deploy-dev]
-
-  deploy-pre-prod:
-    name: Production Admin approval
-    environment: PROD-Pre-Release
-    needs: [deploy-qa]
-    runs-on: [self-hosted, X64, linux]
-
+    needs: [qa, staging, prod]
+    environment: qa-release
+    runs-on: [X64, linux]
     steps:
-      - name: Display approval
-        run: echo Admin approval granted
+      - uses: actions/download-artifact@v4
+        with:
+          name: qa-build
+          path: ./artifacts
+      - name: Display structure of downloaded files
+        run: ls -R ./artifacts
+
+  deploy-staging:
+    name: Deploy Staging
+    needs: [deploy-qa]
+    environment: staging-release
+    runs-on: [X64, linux]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: staging-build
+          path: ./artifacts
+      - name: Display structure of downloaded files
+        run: ls -R ./artifacts
 
   deploy-prod:
     name: Deploy PROD
-    needs: [deploy-pre-prod]
+    needs: [deploy-staging]
+    environment: prod-release
+    runs-on: [X64, linux]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: prod-build
+          path: ./artifacts
+      - name: Display structure of downloaded files
+        run: ls -R ./artifacts
