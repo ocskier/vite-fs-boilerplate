@@ -60,7 +60,7 @@ jobs:
           npm run build
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: qa-build
           path: ./client/dist
@@ -100,7 +100,7 @@ jobs:
           npm run build
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: staging-build
           path: ./client/dist
@@ -140,7 +140,7 @@ jobs:
           npm run build
 
       - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: prod-build
           path: ./client/dist
