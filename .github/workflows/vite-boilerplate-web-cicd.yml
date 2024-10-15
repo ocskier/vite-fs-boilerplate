@@ -29,8 +29,8 @@ jobs:
     name: Build QA
     environment: qa
     runs-on: [X64, windows] # need to add self-hosted runner after docker install
-    container:
-      image: node:20.15-alpine
+    # container: 
+    #   image: node:20.15-alpine docker container image not avail on Windows runner
     env:
       VITE_BASE_URL: ${{secrets.VITE_BASE_URL}}
       VITE_ENV: ${{secrets.VITE_ENV}}
@@ -39,6 +39,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
       - name: Inject env vars
         if: env.VITE_ENV
@@ -66,8 +69,8 @@ jobs:
     name: Build Staging
     environment: staging
     runs-on: [X64, windows] # need to add self-hosted runner after docker install
-    container:
-      image: node:20.15-alpine
+    # container:
+    #   image: node:20.15-alpine
     env:
       VITE_BASE_URL: ${{secrets.VITE_BASE_URL}}
       VITE_ENV: ${{secrets.VITE_ENV}}
@@ -76,6 +79,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
       - name: Inject env vars
         if: env.VITE_ENV
@@ -103,8 +109,8 @@ jobs:
     name: Build PROD
     environment: prod
     runs-on: [X64, windows] # need to add self-hosted runner after docker install
-    container:
-      image: node:20.15-alpine
+    # container:
+    #   image: node:20.15-alpine
     env:
       VITE_BASE_URL: ${{secrets.VITE_BASE_URL}}
       VITE_ENV: ${{secrets.VITE_ENV}}
@@ -113,6 +119,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
       - name: Inject env vars
         if: env.VITE_ENV
