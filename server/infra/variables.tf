@@ -1,4 +1,4 @@
 variable "location" {
   type    = string
-  default = "eastus"
+  default = "East US 2"
 }
