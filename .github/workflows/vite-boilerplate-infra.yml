@@ -1,0 +1,45 @@
+name: Build and update backend architecture - qa / staging
+run-name: QA/Staging Infrastructure ${{github.run_number}}.${{github.run_attempt}}.${{inputs.build-id}} - Create and/or update backend architecture
+
+on:
+  workflow_dispatch:
+    inputs:
+      build-id:
+        description: "The id from the build"
+        required: true
+
+env:
+  subscription_id: ${{env.subscription_id}}
+  author: ${{env.author}},
+  author_email: ${{env.author_email}}
+  author_github: ${{env.author_github}}
+  github_auth_token: ${{env.github_auth_token}}
+  github_auth_secret: ${{env.github_auth_secret}}
+  allowed_ips: ${{env.allowed_ips}}
+
+jobs:
+  update-architecture-qa:
+    name: Update Architecture
+    runs-on: [X64, linux] # need to add self-hosted runner after docker install
+    environment: qa
+    env:
+      env: ${{env.env}}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Update Architecture
+        if: env.env
+        run: echo Injected environment variables
+
+  update-architecture-staging:
+    name: Update Architecture
+    runs-on: [X64, linux] # need to add self-hosted runner after docker install
+    environment: staging
+    env:
+      env: ${{env.env}}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Update Architecture
+        if: env.env
+        run: echo Injected environment variables
