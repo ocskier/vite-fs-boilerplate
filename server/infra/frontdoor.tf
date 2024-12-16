@@ -39,6 +39,7 @@ resource "azurerm_cdn_frontdoor_origin" "vite_fs_app_service_origin" {
   weight                         = 1000
   certificate_name_check_enabled = true
 
+  # Private endpoint connections must be manually approved in web app
   private_link {
     request_message        = "private_link_orig_cdn_fd-${local.afd_app_orig_name}"
     target_type            = "sites"
@@ -47,11 +48,17 @@ resource "azurerm_cdn_frontdoor_origin" "vite_fs_app_service_origin" {
   }
 }
 
+resource "azurerm_cdn_frontdoor_rule_set" "vite_fs_routing_rules" {
+  name                     = "defaultroutingrules"
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.vite_fs_fd.id
+}
+
 resource "azurerm_cdn_frontdoor_route" "vite_fs_swagger_route" {
   name                          = local.afd_swagger_route_name
   cdn_frontdoor_endpoint_id     = azurerm_cdn_frontdoor_endpoint.vite_fs_endpoint.id
   cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.vite_fs_app_orig_group.id
   cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.vite_fs_app_service_origin.id]
+  cdn_frontdoor_rule_set_ids    = [azurerm_cdn_frontdoor_rule_set.vite_fs_routing_rules.id]
 
   supported_protocols    = ["Https"]
   patterns_to_match      = ["/swagger/*"]
@@ -65,6 +72,7 @@ resource "azurerm_cdn_frontdoor_route" "vite_fs_graphql_route" {
   cdn_frontdoor_endpoint_id     = azurerm_cdn_frontdoor_endpoint.vite_fs_endpoint.id
   cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.vite_fs_app_orig_group.id
   cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.vite_fs_app_service_origin.id]
+  cdn_frontdoor_rule_set_ids    = [azurerm_cdn_frontdoor_rule_set.vite_fs_routing_rules.id]
 
   supported_protocols    = ["Https"]
   patterns_to_match      = ["/graphql/*"]
@@ -78,15 +86,11 @@ resource "azurerm_cdn_frontdoor_route" "vite_fs_app_route" {
   cdn_frontdoor_endpoint_id     = azurerm_cdn_frontdoor_endpoint.vite_fs_endpoint.id
   cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.vite_fs_app_orig_group.id
   cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.vite_fs_app_service_origin.id]
+  cdn_frontdoor_rule_set_ids    = [azurerm_cdn_frontdoor_rule_set.vite_fs_routing_rules.id]
 
   supported_protocols    = ["Http", "Https"]
   patterns_to_match      = ["/*"]
   forwarding_protocol    = "MatchRequest"
   link_to_default_domain = true
   https_redirect_enabled = true
-}
-
-resource "azurerm_cdn_frontdoor_rule_set" "vite_fs_routing_rules" {
-  name                     = "defaultroutingrules"
-  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.vite_fs_fd.id
 }
