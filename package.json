@@ -8,7 +8,9 @@
     "dev": "concurrently \"cd client && npm run dev\" \"cd server && npm run start:dev\"",
     "install": "cd client && npm install && cd ../server && npm install",
     "build": "cd client && npm run build",
-    "start": "cd server && npm run start"
+    "start": "cd server && npm run start",
+    "terraform:plan": "cd server/infra && terraform plan -out=./output_plan",
+    "terraform:apply": "terraform apply ./output_plan"
   },
   "repository": {
     "type": "git",
