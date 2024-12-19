@@ -146,7 +146,7 @@ jobs:
           path: .
   deploy-qa:
     name: Deploy QA
-    needs: []
+    needs: [qa, staging, prod]
     environment: qa-release
     runs-on: [X64, macOS, self-hosted]
     steps:
