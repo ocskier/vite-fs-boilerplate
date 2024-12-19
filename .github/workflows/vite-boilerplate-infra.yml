@@ -9,11 +9,11 @@ on:
         required: true
 
 env:
-  subscription_id: ${{env.SUBSCRIPTION_ID}}
-  author: ${{env.AUTHOR}},
-  author_email: ${{env.AUTHOR_EMAIL}}
-  author_github: ${{env.AUTHOR_GITHUB}}
-  allowed_ips: ${{env.ALLOWED_IPS}}
+  subscription_id: ${{secrets.SUBSCRIPTION_ID}}
+  author: ${{vars.AUTHOR}},
+  author_email: ${{secrets.AUTHOR_EMAIL}}
+  author_github: ${{vars.AUTHOR_GITHUB}}
+  allowed_ips: ${{secrets.ALLOWED_IPS}}
 
 jobs:
   update-architecture-qa:
@@ -21,7 +21,7 @@ jobs:
     runs-on: [X64, macOS, self-hosted] # need to add self-hosted runner after docker install
     environment: qa
     env:
-      env: ${{env.ENV}}
+      env: ${{vars.ENV}}
     steps:
       - uses: actions/checkout@v3
 
@@ -97,7 +97,7 @@ jobs:
     runs-on: [X64, macOS, self-hosted] # need to add self-hosted runner after docker install
     environment: staging
     env:
-      env: ${{env.ENV}}
+      env: ${{vars.ENV}}
     steps:
       - uses: actions/checkout@v3
 
