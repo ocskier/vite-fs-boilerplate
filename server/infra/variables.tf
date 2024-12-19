@@ -20,7 +20,7 @@ variable "author_github" {
 
 variable "env" {
   type    = string
-  default = "dev"
+  default = "qa"
 }
 
 variable "location" {

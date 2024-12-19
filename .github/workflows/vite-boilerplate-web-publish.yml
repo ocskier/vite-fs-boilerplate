@@ -2,10 +2,6 @@ name: Deploy app artifacts thru Github pipelines
 run-name: Deploy All Builds ${{inputs.build-id}}-${{github.run_attempt}} - Deploy SPA artifacts to Azure
 
 on:
-  push:
-    branches:
-      - main
-      - "release/**"
   workflow_dispatch:
     inputs:
       build-id:
