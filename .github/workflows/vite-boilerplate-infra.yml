@@ -1,7 +1,11 @@
 name: Build and update backend architecture - qa / staging
-run-name: QA/Staging Infrastructure ${{github.run_number}}.${{github.run_attempt}}.${{inputs.build-id}} - Create and/or update backend architecture
+run-name: QA/Staging Infrastructure ${{inputs.build-id}}-${{github.run_attempt}} - Create and/or update backend architecture
 
 on:
+  push:
+    branches:
+      - main
+      - "release/**"
   workflow_dispatch:
     inputs:
       build-id:
@@ -13,33 +17,158 @@ env:
   author: ${{env.author}},
   author_email: ${{env.author_email}}
   author_github: ${{env.author_github}}
-  github_auth_token: ${{env.github_auth_token}}
-  github_auth_secret: ${{env.github_auth_secret}}
   allowed_ips: ${{env.allowed_ips}}
 
 jobs:
   update-architecture-qa:
     name: Update Architecture
-    runs-on: [X64, linux] # need to add self-hosted runner after docker install
+    runs-on: [X64, macOS, self-hosted] # need to add self-hosted runner after docker install
     environment: qa
     env:
       env: ${{env.env}}
     steps:
       - uses: actions/checkout@v3
 
-      - name: Update Architecture
+      - name: Inject environment vars
+        working-directory: ./server/infra
         if: env.env
         run: echo Injected environment variables
 
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          # terraform_version: 0.13.0:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform Format
+        id: fmt
+        workingdir: ./server/infra
+        run: terraform fmt -check
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -input=false
+
+      - name: Update Pull Request
+        uses: actions/github-script@v6
+        env:
+          PLAN: ${{ steps.plan.outputs.stdout }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+
+            <details><summary>Show Plan</summary>
+
+            \`\`\`terraform\n
+            ${process.env.PLAN}
+            \`\`\`
+
+            </details>
+
+            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false
+
   update-architecture-staging:
     name: Update Architecture
-    runs-on: [X64, linux] # need to add self-hosted runner after docker install
+    runs-on: [X64, macOS, self-hosted] # need to add self-hosted runner after docker install
     environment: staging
     env:
       env: ${{env.env}}
     steps:
       - uses: actions/checkout@v3
 
-      - name: Update Architecture
+      - name: Inject environment vars
+        working-directory: ./server/infra
         if: env.env
         run: echo Injected environment variables
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          # terraform_version: 0.13.0:
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -input=false
+
+      - name: Update Pull Request
+        uses: actions/github-script@v6
+        env:
+          PLAN: ${{ steps.plan.outputs.stdout }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+
+            <details><summary>Show Plan</summary>
+
+            \`\`\`terraform\n
+            ${process.env.PLAN}
+            \`\`\`
+
+            </details>
+
+            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false

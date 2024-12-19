@@ -1,11 +1,11 @@
-name: Build and deploy app artifacts thru Github pipelines
-run-name: Build & Deploy ${{github.run_number}}.${{github.run_attempt}} - Create and deploy SPA artifacts thru Github pipelines
+name: Build app artifacts thru Github pipelines
+run-name: Build ${{github.run_number}}.${{github.run_attempt}} - Create SPA artifacts thru Github pipelines
 
 on:
   push:
     branches:
       - main
-      - 'release/**'
+      - "release/**"
   workflow_dispatch:
 
 env:
@@ -17,7 +17,7 @@ env:
 jobs:
   test-trigger:
     name: Trigger Testing
-    runs-on: [X64, windows] # need to add self-hosted runner after docker install
+    runs-on: [X64, macOS, self-hosted] # need to add self-hosted runner after docker install
     steps:
       - uses: actions/checkout@v3
 
@@ -28,9 +28,9 @@ jobs:
   qa:
     name: Build QA
     environment: qa
-    runs-on: [X64, windows] # need to add self-hosted runner after docker install
-    # container: 
-    #   image: node:20.15-alpine docker container image not avail on Windows runner
+    runs-on: [X64, macOS, self-hosted] # need to add self-hosted runner after docker install
+    # container:
+    #   image: node:20.15-alpine docker container image not avail on self-hosted runner
     env:
       VITE_BASE_URL: ${{secrets.VITE_BASE_URL}}
       VITE_ENV: ${{secrets.VITE_ENV}}
@@ -49,8 +49,8 @@ jobs:
 
       - name: Build client
         run: |
-          cd client 
-      
+          cd client
+
       - name: npm install
         run: |
           npm ci
@@ -63,12 +63,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: qa-build
-          path: ./client/dist
+          path: .
 
   staging:
     name: Build Staging
     environment: staging
-    runs-on: [X64, windows] # need to add self-hosted runner after docker install
+    runs-on: [X64, macOS, self-hosted] # need to add self-hosted runner after docker install
     # container:
     #   image: node:20.15-alpine
     env:
@@ -89,7 +89,7 @@ jobs:
 
       - name: Build client
         run: |
-          cd client 
+          cd client
 
       - name: npm install
         run: |
@@ -103,12 +103,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: staging-build
-          path: ./client/dist
+          path: .
 
   prod:
     name: Build PROD
     environment: prod
-    runs-on: [X64, windows] # need to add self-hosted runner after docker install
+    runs-on: [X64, macOS, self-hosted] # need to add self-hosted runner after docker install
     # container:
     #   image: node:20.15-alpine
     env:
@@ -129,7 +129,7 @@ jobs:
 
       - name: Build client
         run: |
-          cd client 
+          cd client
 
       - name: npm install
         run: |
@@ -143,13 +143,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: prod-build
-          path: ./client/dist
+          path: .
 
   deploy-qa:
     name: Deploy QA
     needs: [qa, staging, prod]
     environment: qa-release
-    runs-on: [X64, windows]
+    runs-on: [X64, macOS, self-hosted]
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -158,12 +158,20 @@ jobs:
 
       - name: Display structure of downloaded files
         run: ls -R ./artifacts
+        working-directory: ./artifacts
+
+      - name: "Deploy to Azure WebApp"
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
 
   deploy-staging:
     name: Deploy Staging
     needs: [deploy-qa]
     environment: staging-release
-    runs-on: [X64, windows]
+    runs-on: [X64, macOS, self-hosted]
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -177,7 +185,7 @@ jobs:
     name: Deploy PROD
     needs: [deploy-staging]
     environment: prod-release
-    runs-on: [X64, windows]
+    runs-on: [X64, macOS, self-hosted]
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -186,3 +194,4 @@ jobs:
 
       - name: Display structure of downloaded files
         run: ls -R ./artifacts
+
