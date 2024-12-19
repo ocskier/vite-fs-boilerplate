@@ -1,5 +1,5 @@
-name: Build app artifacts - QA / Staging / PROD
-run-name: Build ${{github.run_id}}.${{github.run_attempt}} - Create SPA artifacts thru Github pipelines
+name: Build and Deploy app artifacts - QA / Staging / PROD
+run-name: Build / Deploy ${{github.run_id}}.${{github.run_attempt}} - Create web artifacts
 
 on:
   push:
@@ -144,4 +144,54 @@ jobs:
         with:
           name: prod-build
           path: .
+  deploy-qa:
+    name: Deploy QA
+    needs: []
+    environment: qa-release
+    runs-on: [X64, macOS, self-hosted]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: qa-build
+          path: ./artifacts
+
+      - name: Display structure of downloaded files
+        run: ls -R ./artifacts
+        working-directory: ./artifacts
+
+      - name: "Deploy to Azure WebApp"
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ${{ vars.AZURE_WEBAPP_PACKAGE_PATH }}
+
+  deploy-staging:
+    name: Deploy Staging
+    needs: [deploy-qa]
+    environment: staging-release
+    runs-on: [X64, macOS, self-hosted]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: staging-build
+          path: ./artifacts
+
+      - name: Display structure of downloaded files
+        run: ls -R ./artifacts
+
+  deploy-prod:
+    name: Deploy PROD
+    needs: [deploy-staging]
+    environment: prod-release
+    if: vars.PROD_ENABLED
+    runs-on: [X64, macOS, self-hosted]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: prod-build
+          path: ./artifacts
+
+      - name: Display structure of downloaded files
+        run: ls -R ./artifacts
 
