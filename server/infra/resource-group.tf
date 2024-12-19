@@ -4,6 +4,6 @@ resource "azurerm_resource_group" "vite_fs_rg" {
 
   tags = {
     environment = var.env
-    test = true
+    test        = true
   }
 }
