@@ -49,6 +49,7 @@ jobs:
     name: Deploy PROD
     needs: [deploy-staging]
     environment: prod-release
+    if: vars.PROD_ENABLED
     runs-on: [X64, macOS, self-hosted]
     steps:
       - uses: actions/download-artifact@v4
