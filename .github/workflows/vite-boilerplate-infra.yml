@@ -22,11 +22,14 @@ jobs:
     environment: qa
     env:
       env: ${{vars.ENV}}
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./server/infra
     steps:
       - uses: actions/checkout@v3
 
       - name: Inject environment vars
-        working-directory: ./server/infra
         if: env.env
         run: echo Injected environment variables
 
@@ -98,6 +101,10 @@ jobs:
     environment: staging
     env:
       env: ${{vars.ENV}}
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./server/infra
     steps:
       - uses: actions/checkout@v3
 
