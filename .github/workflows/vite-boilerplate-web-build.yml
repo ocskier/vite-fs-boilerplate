@@ -1,4 +1,4 @@
-name: Build app artifacts thru Github pipelines
+name: Build app artifacts - QA / Staging / PROD
 run-name: Build ${{github.run_number}}.${{github.run_attempt}} - Create SPA artifacts thru Github pipelines
 
 on:

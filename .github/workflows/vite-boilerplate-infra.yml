@@ -1,4 +1,4 @@
-name: Build and update backend architecture - qa / staging
+name: Build backend architecture - QA / Staging
 run-name: QA/Staging Infrastructure ${{inputs.build-id}}-${{github.run_attempt}} - Create and/or update backend architecture
 
 on:

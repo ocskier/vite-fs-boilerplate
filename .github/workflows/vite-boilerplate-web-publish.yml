@@ -1,4 +1,4 @@
-name: Deploy app artifacts thru Github pipelines
+name: Deploy app artifacts - QA / Staging / PROD
 run-name: Deploy All Builds ${{inputs.build-id}}-${{github.run_attempt}} - Deploy SPA artifacts to Azure
 
 on:
