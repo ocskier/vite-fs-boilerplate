@@ -1,10 +1,10 @@
 name: Deploy app artifacts - QA / Staging / PROD
-run-name: Deploy All Builds ${{inputs.build-id}}-${{github.run_attempt}} - Deploy SPA artifacts to Azure
+run-name: Deploy All Builds ${{inputs.run-id}}-${{github.run_attempt}} - Deploy SPA artifacts to Azure
 
 on:
   workflow_dispatch:
     inputs:
-      build-id:
+      run-id:
         description: "The id from the build"
         required: true
 
@@ -19,6 +19,7 @@ jobs:
         with:
           name: qa-build
           path: ./artifacts
+          run-id: ${{inputs.run-id}}
 
       - name: Display structure of downloaded files
         run: ls -R ./artifacts

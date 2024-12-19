@@ -1,10 +1,10 @@
 name: Build backend architecture - QA / Staging
-run-name: QA/Staging Infrastructure ${{inputs.build-id}}-${{github.run_attempt}} - Create and/or update backend architecture
+run-name: QA/Staging Infrastructure ${{inputs.run-id}}-${{github.run_attempt}} - Create and/or update backend architecture
 
 on:
   workflow_dispatch:
     inputs:
-      build-id:
+      run-id:
         description: "The id from the build"
         required: true
 
