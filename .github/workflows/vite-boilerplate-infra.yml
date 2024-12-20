@@ -22,7 +22,7 @@ env:
 jobs:
   update-architecture-qa:
     name: Update Architecture - QA
-    runs-on: [X64, macOS, self-hosted] # need to add self-hosted runner after docker install
+    runs-on: [ubuntu-latest] # need to add self-hosted runner after docker install
     environment: qa
     env:
       TF_VAR_env: ${{vars.ENV}}
@@ -50,7 +50,7 @@ jobs:
 
   update-architecture-staging:
     name: Update Architecture - Staging
-    runs-on: [X64, macOS, self-hosted] # need to add self-hosted runner after docker install
+    runs-on: [ubuntu-latest] # need to add self-hosted runner after docker install
     environment: staging
     env:
       TF_VAR_env: ${{vars.ENV}}
