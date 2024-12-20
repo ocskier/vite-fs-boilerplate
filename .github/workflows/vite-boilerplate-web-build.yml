@@ -157,7 +157,7 @@ jobs:
           path: ./artifacts
 
       - name: Display structure of downloaded files
-        run: ls -R ./artifacts
+        run: ls ./artifacts
 
       - name: "Deploy to Azure WebApp"
         uses: azure/webapps-deploy@v3
@@ -178,7 +178,7 @@ jobs:
           path: ./artifacts
 
       - name: Display structure of downloaded files
-        run: ls -R ./artifacts
+        run: ls ./artifacts
 
   deploy-prod:
     name: Deploy PROD
@@ -193,5 +193,5 @@ jobs:
           path: ./artifacts
 
       - name: Display structure of downloaded files
-        run: ls -R ./artifacts
+        run: ls ./artifacts
 

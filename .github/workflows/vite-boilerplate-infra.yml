@@ -13,7 +13,7 @@ env:
   TF_VAR_author: ${{vars.AUTHOR}},
   TF_VAR_author_email: ${{secrets.AUTHOR_EMAIL}}
   TF_VAR_author_github: ${{vars.AUTHOR_GITHUB}}
-  TF_VAR_allowed_ips: ${{secrets.ALLOWED_IPS}}
+  TF_VAR_allowed_ips: ${{fromJson(secrets.ALLOWED_IPS)}}
 
 jobs:
   update-architecture-qa:

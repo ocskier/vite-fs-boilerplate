@@ -7,7 +7,7 @@ resource "azurerm_linux_web_app" "vite_fs_boilerplate" {
   https_only                    = true
 
   site_config {
-    app_command_line                  = "npm run install && npm run server"
+    app_command_line                  = "npm run install && npm run start"
     health_check_path                 = "/api/health"
     health_check_eviction_time_in_min = 5
     minimum_tls_version               = "1.2"
