@@ -50,6 +50,7 @@ jobs:
 
   update-architecture-staging:
     name: Update Architecture - Staging
+    needs: [update-architecture-qa]
     runs-on: [ubuntu-latest] # need to add self-hosted runner after docker install
     environment: staging
     env:
