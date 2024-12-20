@@ -157,7 +157,7 @@ jobs:
           path: ./artifacts
 
       - name: Display structure of downloaded files
-        run: ls -R ./artifacts/qa-build
+        run: ls -R ./artifacts
 
       - name: "Deploy to Azure WebApp"
         uses: azure/webapps-deploy@v3
