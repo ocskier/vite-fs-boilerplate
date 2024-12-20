@@ -164,7 +164,7 @@ jobs:
         with:
           app-name: ${{ vars.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ./artifacts/qa-build
+          package: ./artifacts
 
   deploy-staging:
     name: Deploy Staging
@@ -178,7 +178,7 @@ jobs:
           path: ./artifacts
 
       - name: Display structure of downloaded files
-        run: ls -R ./artifacts/staging-build
+        run: ls -R ./artifacts
 
   deploy-prod:
     name: Deploy PROD
@@ -193,5 +193,5 @@ jobs:
           path: ./artifacts
 
       - name: Display structure of downloaded files
-        run: ls -R ./artifacts/prod-build
+        run: ls -R ./artifacts
 
