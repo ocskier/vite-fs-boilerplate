@@ -23,7 +23,7 @@ resource "azurerm_linux_web_app" "vite_fs_boilerplate" {
     }
 
     dynamic "ip_restriction" {
-      for_each = var.allowed_ips
+      for_each = var.ALLOWED_IPS
       content {
         name       = "gh-runners-${ip_restriction.key}"
         action     = "Allow"

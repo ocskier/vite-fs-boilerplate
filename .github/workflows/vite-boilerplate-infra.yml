@@ -9,11 +9,15 @@ on:
         required: true
 
 env:
-  TF_VAR_subscription_id: ${{secrets.SUBSCRIPTION_ID}}
-  TF_VAR_author: ${{vars.AUTHOR}},
-  TF_VAR_author_email: ${{secrets.AUTHOR_EMAIL}}
-  TF_VAR_author_github: ${{vars.AUTHOR_GITHUB}}
-  TF_VAR_allowed_ips: ${{secrets.ALLOWED_IPS}}
+  TF_CLOUD_ORGANIZATION: ${{ vars.TF_CLOUD_ORGANIZATION }}
+  TF_WORKSPACE: ${{ vars.TF_WORKSPACE }}
+  TF_API_TOKEN: ${{ secrets.TF_API_TOKEN }}
+  TF_VAR_AUTHOR: ${{vars.AUTHOR}},
+  TF_VAR_AUTHOR_EMAIL: ${{secrets.AUTHOR_EMAIL}}
+  TF_VAR_AUTHOR_GITHUB: ${{vars.AUTHOR_GITHUB}}
+  TF_VAR_SUBSCRIPTION_ID: ${{secrets.SUBSCRIPTION_ID}}
+  TF_VAR_ALLOWED_IPS: ${{secrets.ALLOWED_IPS}}
+  CONFIG_DIRECTORY: "./server/infra"
 
 jobs:
   update-architecture-qa:
@@ -22,79 +26,27 @@ jobs:
     environment: qa
     env:
       TF_VAR_env: ${{vars.ENV}}
-    defaults:
-      run:
-        shell: bash
-        working-directory: ./server/infra
     steps:
       - uses: actions/checkout@v3
 
-      - name: Inject environment vars
-        if: env.TF_VAR_env
-        run: echo Injected environment variables
-
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+      - uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.3.2
+        id: upload
         with:
-          # terraform_version: 0.13.0:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+          workspace: ${{ env.TF_WORKSPACE }}
+          directory: ${{ env.CONFIG_DIRECTORY }}
 
-      - name: Terraform Format
-        id: fmt
-        run: terraform fmt -check
+      - uses: hashicorp/tfc-workflows-github/actions/create-run@v1.3.2
+        id: create-run
+        with:
+          workspace: ${{ env.TF_WORKSPACE }}
+          configuration_version: ${{ steps.upload.outputs.configuration_version_id }}
 
-      - name: Terraform Init
-        id: init
-        run: terraform init
-
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
-
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan -no-color -input=false
-
-      # - name: Update Pull Request
-      #   uses: actions/github-script@v6
-      #   env:
-      #     PLAN: ${{ steps.plan.outputs.stdout }}
-      #   with:
-      #     github-token: ${{ secrets.GITHUB_TOKEN }}
-      #     script: |
-      #       const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-      #       #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-      #       #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
-      #       #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-
-      #       <details><summary>Show Plan</summary>
-
-      #       \`\`\`terraform\n
-      #       ${process.env.PLAN}
-      #       \`\`\`
-
-      #       </details>
-
-      #       *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-
-      #       github.rest.issues.createComment({
-      #         issue_number: context.issue.number,
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #         body: output
-      #       })
-
-      - name: Terraform Plan Status
-        if: steps.plan.outcome == 'failure'
-        run: exit 1
-
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
-        # && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false
+      - uses: hashicorp/tfc-workflows-github/actions/apply-run@v1.3.2
+        id: apply
+        if: ${{ fromJSON(steps.create-run.outputs.payload).data.attributes.actions.IsConfirmable }}
+        with:
+          run: ${{ steps.create-run.outputs.run_id }}
+          comment: "Apply Run from GitHub Actions CI ${{ github.sha }}"
 
   update-architecture-staging:
     name: Update Architecture - Staging
@@ -102,77 +54,24 @@ jobs:
     environment: staging
     env:
       TF_VAR_env: ${{vars.ENV}}
-    defaults:
-      run:
-        shell: bash
-        working-directory: ./server/infra
     steps:
       - uses: actions/checkout@v3
 
-      - name: Inject environment vars
-        working-directory: ./server/infra
-        if: env.TF_VAR_env
-        run: echo Injected environment variables
-
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+      - uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.3.2
+        id: upload
         with:
-          # terraform_version: 0.13.0:
-          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+          workspace: ${{ env.TF_WORKSPACE }}
+          directory: ${{ env.CONFIG_DIRECTORY }}
 
-      - name: Terraform Format
-        id: fmt
-        run: terraform fmt -check
+      - uses: hashicorp/tfc-workflows-github/actions/create-run@v1.3.2
+        id: create-run
+        with:
+          workspace: ${{ env.TF_WORKSPACE }}
+          configuration_version: ${{ steps.upload.outputs.configuration_version_id }}
 
-      - name: Terraform Init
-        id: init
-        run: terraform init
-
-      - name: Terraform Validate
-        id: validate
-        run: terraform validate -no-color
-
-      - name: Terraform Plan
-        id: plan
-        run: terraform plan -no-color -input=false
-
-      # - name: Update Pull Request
-      #   uses: actions/github-script@v6
-      #   env:
-      #     PLAN: ${{ steps.plan.outputs.stdout }}
-      #   with:
-      #     github-token: ${{ secrets.GITHUB_TOKEN }}
-      #     script: |
-      #       const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-      #       #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-      #       #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
-      #       #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-
-      #       <details><summary>Show Plan</summary>
-
-      #       \`\`\`terraform\n
-      #       ${process.env.PLAN}
-      #       \`\`\`
-
-      #       </details>
-
-      #       *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-
-      #       github.rest.issues.createComment({
-      #         issue_number: context.issue.number,
-      #         owner: context.repo.owner,
-      #         repo: context.repo.repo,
-      #         body: output
-      #       })
-
-      - name: Terraform Plan Status
-        if: steps.plan.outcome == 'failure'
-        run: exit 1
-
-      - name: Terraform Apply
-        if: github.ref == 'refs/heads/main'
-        # && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false
+      - uses: hashicorp/tfc-workflows-github/actions/apply-run@v1.3.2
+        id: apply
+        if: ${{ fromJSON(steps.create-run.outputs.payload).data.attributes.actions.IsConfirmable }}
+        with:
+          run: ${{ steps.create-run.outputs.run_id }}
+          comment: "Apply Run from GitHub Actions CI ${{ github.sha }}"

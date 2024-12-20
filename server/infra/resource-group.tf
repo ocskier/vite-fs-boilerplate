@@ -1,9 +1,9 @@
 resource "azurerm_resource_group" "vite_fs_rg" {
   name     = local.rg_name
-  location = var.location
+  location = var.LOCATION
 
   tags = {
-    environment = var.env
+    environment = var.ENV
     test        = true
   }
 }

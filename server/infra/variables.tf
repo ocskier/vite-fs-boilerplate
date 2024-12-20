@@ -1,34 +1,34 @@
-variable "subscription_id" {
+variable "SUBSCRIPTION_ID" {
   type    = string
   default = null
 }
 
-variable "author" {
+variable "AUTHOR" {
   type    = string
   default = null
 }
 
-variable "author_email" {
+variable "AUTHOR_EMAIL" {
   type    = string
   default = null
 }
 
-variable "author_github" {
+variable "AUTHOR_GITHUB" {
   type    = string
   default = null
 }
 
-variable "env" {
+variable "ENV" {
   type    = string
   default = "qa"
 }
 
-variable "location" {
+variable "LOCATION" {
   type    = string
   default = "East US 2"
 }
 
-variable "allowed_ips" {
+variable "ALLOWED_IPS" {
   type    = set(string)
   default = []
 }

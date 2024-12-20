@@ -1,4 +1,10 @@
 terraform {
+  cloud {
+    organization = "azure-test-org"
+    workspaces {
+      name = "vite-fs-boilerplate"
+    }
+  }
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -9,6 +15,6 @@ terraform {
 }
 
 provider "azurerm" {
-  subscription_id = var.subscription_id
+  subscription_id = var.SUBSCRIPTION_ID
   features {}
 }
