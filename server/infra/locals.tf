@@ -5,7 +5,7 @@ locals {
   project_author_email    = var.AUTHOR_EMAIL
   project_author_github   = var.AUTHOR_GITHUB
   rg_name                 = "vite-fs-rg-${var.ENV}"
-  storage_acct            = "vite-fs-storage-${var.ENV}"
+  storage_acct            = "vitefsstorage${var.ENV}"
   app_service_plan_name   = "vite-fs-asp-${var.ENV}"
   afd_name                = "vite-fs-afd-${var.ENV}"
   afd_endpoint_name       = "vite-fs-afde-${var.ENV}"
