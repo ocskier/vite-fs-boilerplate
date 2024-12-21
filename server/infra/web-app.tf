@@ -3,7 +3,7 @@ resource "azurerm_linux_web_app" "vite_fs_boilerplate" {
   location                      = azurerm_resource_group.vite_fs_rg.location
   resource_group_name           = azurerm_resource_group.vite_fs_rg.name
   service_plan_id               = azurerm_service_plan.vite_fs_appserviceplan.id
-  public_network_access_enabled = false
+  public_network_access_enabled = true
   https_only                    = true
 
   site_config {
