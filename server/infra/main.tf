@@ -1,9 +1,6 @@
 terraform {
   cloud {
     organization = "azure-test-org"
-    workspaces {
-      name = "vite-fs-boilerplate"
-    }
   }
   required_providers {
     azurerm = {
