@@ -14,6 +14,10 @@ env:
   VITE_SSO_OAUTH_SCOPE: ${{secrets.VITE_SSO_OAUTH_SCOPE}}
   SASS_PATH: ${{secrets.SASS_PATH}}
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   test-trigger:
     name: Trigger Testing
