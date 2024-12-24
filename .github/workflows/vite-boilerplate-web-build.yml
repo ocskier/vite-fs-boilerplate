@@ -177,7 +177,7 @@ jobs:
           subscription-id: ${{ secrets.AZ_SUBSCRIPTION_ID }}
 
       - name: Set SAS token expiration
-        run: echo "expiry=`date -u -d "10" '+%Y-%m-%dT%H:%MZ'`" >> $GITHUB_ENV
+        run: echo "expiry=`date -u -d "10 minutes" '+%Y-%m-%dT%H:%MZ'`" >> $GITHUB_ENV
 
       - name: Azure CLI script
         uses: azure/cli@v2
