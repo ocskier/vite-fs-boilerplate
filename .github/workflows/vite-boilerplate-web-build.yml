@@ -159,11 +159,11 @@ jobs:
       - name: Display structure of downloaded files
         run: ls ./artifacts
 
-      - name: Zip the app contents
-        uses: vimtor/action-zip@v1.2
-        with:
-          files: ./artifacts
-          dest: app.zip
+      # - name: Zip the app contents
+      #   uses: vimtor/action-zip@v1.2
+      #   with:
+      #     files: ./artifacts
+      #     dest: app.zip
 
       - name: Azure CLI Login
         uses: azure/login@v2
@@ -171,6 +171,9 @@ jobs:
           client-id: ${{ secrets.AZ_CLIENT_ID }}
           tenant-id: ${{ secrets.AZ_TENANT_ID }}
           subscription-id: ${{ secrets.AZ_SUBSCRIPTION_ID }}
+
+      - name: Set SAS token expiration
+        run: echo "expiry=`date -u -d "10" '+%Y-%m-%dT%H:%MZ'`" >> $GITHUB_ENV
 
       - name: Azure CLI script
         uses: azure/cli@v2
@@ -180,8 +183,8 @@ jobs:
             az account show
             az extension add --name webapp
 
-            az storage blob upload -f app.zip --account-name vitefsstorageqa -c app -n vitefsstorageqa
-            ZIP_URL=$(az storage blob generate-sas --full-uri --permissions r --expiry  --account-name vitefsstorageqa -c app -n vitefsstorageqa | xargs)
+            az storage blob upload -f ./artifacts --account-name vitefsstorageqa -c app -n vitefsstorageqa
+            ZIP_URL=$(az storage blob generate-sas --full-uri --permissions r --expiry ${{ env.expiry }}  --account-name vitefsstorageqa -c app -n vitefsstorageqa | xargs)
             az webapp deploy --name vite-fs-boilerplate-qa-app --resource-group vite-fs-rg-qa --type zip --src-url  $ZIP_URL --async false
 
   deploy-staging:
