@@ -152,7 +152,7 @@ jobs:
         run: ls ./artifacts
 
       - name: Zip the app contents
-        run: cd artifacts && zip -r app.zip .
+        run: cd artifacts && zip -r -q app.zip .
 
       - name: Azure CLI Login
         uses: azure/login@v2
