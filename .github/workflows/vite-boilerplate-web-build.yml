@@ -172,7 +172,7 @@ jobs:
             az account show
             az extension add --name webapp
 
-            az storage blob upload -f app.zip --account-name vitefsstorageqa -c app -n vitefsstorageqa
+            az storage blob upload -f ./artifacts/app.zip --account-name vitefsstorageqa -c app -n vitefsstorageqa
             ZIP_URL=$(az storage blob generate-sas --full-uri --permissions r --expiry ${{ env.expiry }}  --account-name vitefsstorageqa -c app -n vitefsstorageqa | xargs)
             az webapp deploy --name vite-fs-boilerplate-qa-app --resource-group vite-fs-rg-qa --type zip --src-url  $ZIP_URL --async false
 
