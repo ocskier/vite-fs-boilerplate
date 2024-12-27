@@ -51,13 +51,9 @@ jobs:
         if: env.VITE_ENV
         run: echo Injected environment variables
 
-      - name: Build client
-        run: |
-          cd client
-
       - name: npm install
         run: |
-          npm ci
+          npm run install
 
       - name: npm build
         run: |
@@ -91,13 +87,9 @@ jobs:
         if: env.VITE_ENV
         run: echo Injected environment variables
 
-      - name: Build client
-        run: |
-          cd client
-
       - name: npm install
         run: |
-          npm ci
+          npm run install
 
       - name: npm build
         run: |
@@ -131,13 +123,9 @@ jobs:
         if: env.VITE_ENV
         run: echo Injected environment variables
 
-      - name: Build client
-        run: |
-          cd client
-
       - name: npm install
         run: |
-          npm ci
+          npm run install
 
       - name: npm build
         run: |
@@ -164,7 +152,7 @@ jobs:
         run: ls ./artifacts
 
       - name: Zip the app contents
-        run: zip -r app.zip ./artifacts
+        run: cd artifacts && zip -r app.zip .
 
       - name: Azure CLI Login
         uses: azure/login@v2
